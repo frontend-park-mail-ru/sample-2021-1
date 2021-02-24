@@ -1,3 +1,5 @@
+@import "components/Board/Board.css";
+
 a, input, img {
   display: block;
 }

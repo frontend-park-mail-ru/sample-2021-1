@@ -105,6 +105,20 @@ app.get('/me', function (req, res) {
   res.json(users[email]);
 });
 
+app.get('/users', function (req, res) {
+  const scorelist = Object.values(users)
+    .sort((l, r) => r.score - l.score)
+    .map(user => {
+      return {
+        email: user.email,
+        age: user.age,
+        score: user.score,
+      }
+    });
+
+  res.json(scorelist);
+});
+
 const port = process.env.PORT || 3000;
 
 app.listen(port, function () {
