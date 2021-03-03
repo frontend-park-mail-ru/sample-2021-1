@@ -33,6 +33,53 @@
                 method: 'GET',
             });
         }
+
+        promisifyGet(params = {}) {
+            return new Promise((resolve, reject) => {
+                this.#ajax({
+                    ...params,
+                    method: 'GET',
+                    callback: (status, responseText) => {
+                        // 100, 200, 201, 204, ...
+                        if (status < 300) {
+                            resolve({status, responseText});
+                            return;
+                        }
+
+                        reject({status, responseText});
+                    },
+                });
+            });
+        }
+
+        getUsingFetch(params = {}) {
+            let status;
+
+            return fetch(params.url, {
+                method: 'GET'
+            }).then((response) => {
+                status = response.status;
+                return response.json();
+            }).then((parsedJson) => {
+                return {
+                    status,
+                    parsedJson,
+                };
+            });
+        }
+
+        async asyncGetUsingFetch(params = {}) {
+            const response = await fetch(params.url, {
+                method: 'GET'
+            });
+            const parsedJson = await response.json();
+
+            return {
+                status: response.status,
+                parsedJson,
+            };
+        }
+
         post(params = {}) {
             this.#ajax({
                 ...params,
