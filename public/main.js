@@ -177,54 +177,45 @@ function loginPage() {
 function profilePage() {
     application.innerHTML = '';
 
-    HttpModule.get({
-        url: '/me',
-        callback: (status, responseText) => {
-            let isAuthorized = false;
+    HttpModule.asyncGetUsingFetch({
+        url: '/me'
+    })
+        .then(({status, parsedJson}) => {
+            const span = document.createElement('span');
+            span.innerHTML = `Мне ${parsedJson.age} и я крутой на ${parsedJson.score} очков`;
 
-            if (status === 200) {
-                isAuthorized = true;
+
+            application.appendChild(span);
+
+            const back = createBack();
+
+            application.appendChild(back);
+
+
+            const {images} = parsedJson;
+
+            if (images && Array.isArray(images)) {
+                const div = document.createElement('div');
+                application.appendChild(div);
+
+                images.forEach((imageSrc) => {
+                    div.innerHTML += `<img src="${imageSrc}" width="400" />`;
+                });
             }
 
-            if (status === 401) {
-                isAuthorized = false;
+            return;
+        })
+        .catch((err) => {
+            if (err instanceof Error) {
+                // handle JSON.parse error
             }
 
+            const {status, responseText} = err;
 
-            if (isAuthorized) {
-                const responseBody = JSON.parse(responseText);
-
-                const span = document.createElement('span');
-                span.innerHTML = `Мне ${responseBody.age} и я крутой на ${responseBody.score} очков`;
-
-
-                application.appendChild(span);
-
-                const back = createBack();
-
-                application.appendChild(back);
-
-
-                const {images} = responseBody;
-
-                if (images && Array.isArray(images)) {
-                    const div = document.createElement('div');
-                    application.appendChild(div);
-
-                    images.forEach((imageSrc) => {
-                        div.innerHTML += `<img src="${imageSrc}" width="400" />`;
-                    });
-                }
-
-                return;
-            }
-
-
-            alert('АХТУНГ! НЕТ АВТОРИЗАЦИИ');
+            alert(`АХТУНГ! НЕТ АВТОРИЗАЦИИ: ${JSON.stringify({status, responseText})}`);
 
             loginPage();
-        },
-    });
+        });
 }
 
 menuPage();
