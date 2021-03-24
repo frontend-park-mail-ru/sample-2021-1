@@ -5,6 +5,16 @@ import {
 } from './components/Board/Board.js';
 const HttpModule = window.HttpModule;
 
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js', {scope: '/'})
+        .then((registration) => {
+            console.log('sw registration on scope:', registration.scope);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
+}
+
 const application = document.getElementById('app');
 
 const config = {
